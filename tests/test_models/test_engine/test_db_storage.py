@@ -67,6 +67,18 @@ test_db_storage.py'])
             self.assertTrue(len(func[1].__doc__) >= 1,
                             "{:s} method needs a docstring".format(func[0]))
 
+    def test_get(self):
+	"""Test that get() returns the expected object"""
+	user_id = self.user.id
+	retrieved_user = storage.get(User, user_id)
+	assert retrieved_user is not None
+	assert retrieved_user.id == user_id
+
+    def test_count(self):
+	"""Test that count() returns the expected number of objects"""
+	user_count = storage.count(User)
+	assert user_count == 1
+
 
 class TestFileStorage(unittest.TestCase):
     """Test the FileStorage class"""
