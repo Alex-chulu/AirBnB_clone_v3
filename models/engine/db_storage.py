@@ -71,6 +71,53 @@ class DBStorage:
         Session = scoped_session(sess_factory)
         self.__session = Session
 
+    def get(self, cls, id):
+	"""
+	Retrieve a single object based on its ID.
+
+        Args:
+            cls (str): The name of the model class to retrieve.
+            id (str): The ID of the object to retrieve.
+
+        Returns:
+            dict: A JSON representation of the object.
+	"""
+	# Get the class from the BaseModel registry
+	cls = BaseModel.registry.get(cls)
+	if cls is None:
+	    abort(404, f"No such class: {cls}")
+
+	#Retrieve the object from storage
+	obj = storage.get(cls, id)
+	if obj is None:
+	    abort(404, f"No such object: {cls} {id}")
+
+	# Convert the object to a dictionary
+	return jsonify(obj.to_dict())
+
+    def count(self, cls=None):
+	"""
+        Count the number of objects in storage.
+
+        Args:
+            cls (class, optional): The class of objects to count. Defaults to None.
+
+        Returns:
+            int: The number of objects in storage matching the given class(s).
+        """
+	if cls is None:
+	    # Count allobjects in istorage
+	    count = 0
+	    for cls in BaseModel.registry.values():
+		count += storage.count(cls)
+	    return count
+	else:
+	    # Count only objects of a specific class
+	    cls = BaseModel.registry.get(cls)
+	    if cls is None:
+	        raise ValueError(f"No such class: {cls}")
+	    return storage.count(cls)
+
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
