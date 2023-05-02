@@ -27,3 +27,7 @@ if __name__ == '__main__':
 
   # Start Flask server with specified options
   app.run(host=host, port=port, threaded=True)
+
+@app.errorhandler(404) #error handler
+def not_found(error):
+  return make_response(jsonify({'error': 'Not found'}), 404)
